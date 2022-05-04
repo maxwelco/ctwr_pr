@@ -1,0 +1,31 @@
+---
+title: "analysis"
+author: "Maxwel Coura Oliveira"
+date: "5/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+
+```{r}
+data <- read_excel("data.xlsx") |> 
+  mutate_if(is_character, as_factor) 
+```
+
+
+```{r}
+data |> 
+  ggplot(aes(x = dap, y = yield, color = herbicida)) +
+  geom_point() +
+  facet_grid(~ location)
+```
+
