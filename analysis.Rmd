@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(readxl)
+library(drc)
 ```
 
 
@@ -29,3 +30,26 @@ data |>
   facet_grid(~ location)
 ```
 
+```{r}
+palotina <- data |> 
+  filter(location == "palotina")
+  
+pal_model <- drm(yield ~ dap, herbicida, fct = W1.3(), data = palotina)
+```
+
+```{r}
+summary(pal_model)
+plot(pal_model)
+```
+
+```{r}
+curitiba <- data |> 
+  filter(location == "curitiba")
+  
+cur_model <- drm(yield ~ dap, herbicida, fct = l4(), data = curitiba)
+```
+
+```{r}
+summary(cur_model)
+plot(cur_model, log = "")
+```
