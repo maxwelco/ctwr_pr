@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(ggthemes)
 library(readxl)
 library(drc)
 ```
@@ -25,31 +26,94 @@ data <- read_excel("data.xlsx") |>
 
 ```{r}
 data |> 
-  ggplot(aes(x = dap, y = yield, color = herbicida)) +
+  ggplot(aes(x = dap, y = yield_loss, color = herbicida)) +
   geom_point() +
-  facet_grid(~ location)
+#  facet_grid(~ location) +
+  theme_bw()
 ```
+
+```{r}
+modelo <- drm(yield_loss ~ dap, herbicida, fct = W1.3(fixed = c(NA, 50, NA)), data = data)
+
+plot(modelo, ylim = c(0, 100))
+
+
+```
+
+
+
 
 ```{r}
 palotina <- data |> 
   filter(location == "palotina")
   
 pal_model <- drm(yield ~ dap, herbicida, fct = W1.3(), data = palotina)
+
+
+pal_model1 <- drm(yield_loss ~ dap, herbicida, fct = W1.3(fixed = c(NA, 80, NA)),
+                  data = palotina)
 ```
 
 ```{r}
-summary(pal_model)
-plot(pal_model)
+plot(pal_model, ylim = c(0, 3000))
+
+
+
+plot(pal_model1,  ylim = c(0, 100))
 ```
+
+
+```{r}
+broom::tidy(pal_model)
+broom::tidy(pal_model1)
+```
+
+```{r}
+ED(pal_model, c(2, 5, 10))
+
+
+
+
+ED(pal_model1, c(2, 5, 10), type = "absolute")
+```
+
+
+
+
+
+
+
+
 
 ```{r}
 curitiba <- data |> 
-  filter(location == "curitiba")
+  filter(location == "curitiba") |> 
+  filter(herbicida != "diclosulan + pyrosaxulfone")
   
-cur_model <- drm(yield ~ dap, herbicida, fct = l4(), data = curitiba)
+cur_model <- drm(yield ~ dap, herbicida, fct = l3(), data = curitiba)
+
+cur_model1 <- drm(yield_loss ~ dap, herbicida, fct = W1.4(fixed = c(NA,NA,NA,NA)), 
+                  data = curitiba)
 ```
 
 ```{r}
-summary(cur_model)
 plot(cur_model, log = "")
+plot(cur_model1, log = "", ylim = c(0,100))
 ```
+```{r}
+broom::tidy(cur_model)
+broom::tidy(cur_model1)
+```
+
+
+```{r}
+ED(cur_model, c(3974.215), type = "absolute")
+```
+
+
+
+
+
+
+
+
