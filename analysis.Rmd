@@ -24,62 +24,64 @@ data <- read_excel("data.xlsx") |>
 ```
 
 
-```{r}
-data |> 
-  ggplot(aes(x = dap, y = yield_loss, color = herbicida)) +
-  geom_point() +
-#  facet_grid(~ location) +
-  theme_bw()
-```
-
-```{r}
-modelo <- drm(yield_loss ~ dap, herbicida, fct = W1.3(fixed = c(NA, 50, NA)), data = data)
-
-plot(modelo, ylim = c(0, 100))
-
-
-```
-
-
-
 
 ```{r}
 palotina <- data |> 
   filter(location == "palotina")
   
 pal_model <- drm(yield ~ dap, herbicida, fct = W1.3(), data = palotina)
-
-
-pal_model1 <- drm(yield_loss ~ dap, herbicida, fct = W1.3(fixed = c(NA, 80, NA)),
-                  data = palotina)
 ```
 
+
 ```{r}
-plot(pal_model, ylim = c(0, 3000))
-
-
-
-plot(pal_model1,  ylim = c(0, 100))
+plot(pal_model, ylim = c(0, 3000), log = "")
 ```
 
 
 ```{r}
 broom::tidy(pal_model)
-broom::tidy(pal_model1)
 ```
 
 ```{r}
-ED(pal_model, c(2, 5, 10))
-
-
-
-
-ED(pal_model1, c(2, 5, 10), type = "absolute")
+ED(pal_model, c(2, 5, 10)) 
 ```
 
 
+```{r Control prediction, include=FALSE}
+newdata <- expand.grid(dap=exp(seq(log(0.5), log(121), length=121)))
 
+newdata1 <- data.frame(herbicida = c("sem pre-emergente"), newdata)
+newdata2 <- data.frame(herbicida = c("diclosulan + pyrosaxulfone"), newdata)
+newdata3 <- data.frame(herbicida = c("flumioxazin + pyrosaxulfone"), newdata)
+newdata4 <- data.frame(herbicida = c("sulfentrazone + diuron"), newdata)
 
+nd=rbind(newdata1, newdata2, newdata3, newdata4)
+
+pm <- predict(pal_model, newdata=nd, interval="confidence")
+nd$p <- pm[,1] 
+nd$pmin <- pm[,2] 
+nd$pmax <- pm[,3] 
+
+palotina$dap0 <- palotina$dap
+palotina$dap0[palotina$dap0==0] <- 0.5
+```
+
+```{r}
+palotina |> 
+  ggplot(aes(x = dap, y = yield, color = herbicida, linetype=herbicida)) +
+  geom_line(data=nd, aes(x=dap, y=p), size=1.3) +
+  theme_base() +
+  scale_y_continuous(limits = c(0, 2500)) +
+  labs(color = NULL, linetype = NULL,
+       x = "Dias após o plantio",
+       y = expression(paste("Produtividade (kg ha "^"-1",")"))) +
+  scale_color_brewer(palette = "Set1") +
+  guides(color = guide_legend(reverse = TRUE),
+         linetype = guide_legend(reverse = TRUE)) +
+  theme(legend.position = c(0.3, 0.15))
+
+ggsave("palotina.png", width = 6, height = 5)
+```
 
 
 
