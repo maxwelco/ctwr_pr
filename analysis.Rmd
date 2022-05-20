@@ -39,6 +39,7 @@ plot(pal_model, ylim = c(0, 3000), log = "")
 
 
 ```{r}
+summary(pal_model)
 broom::tidy(pal_model)
 ```
 
@@ -68,16 +69,20 @@ palotina$dap0[palotina$dap0==0] <- 0.5
 
 ```{r}
 palotina |> 
-  ggplot(aes(x = dap, y = yield, color = herbicida, linetype=herbicida)) +
+  ggplot(aes(x = dap, y = yield, color = herbicida, 
+             linetype = herbicida,
+             pch = herbicida)) +
   geom_line(data=nd, aes(x=dap, y=p), size=1.3) +
+  geom_point(alpha = 0.1) +
   theme_base() +
   scale_y_continuous(limits = c(0, 2500)) +
-  labs(color = NULL, linetype = NULL,
+  labs(color = NULL, linetype = NULL, pch = NULL,
        x = "Dias após o plantio",
        y = expression(paste("Produtividade (kg ha "^"-1",")"))) +
   scale_color_brewer(palette = "Set1") +
   guides(color = guide_legend(reverse = TRUE),
-         linetype = guide_legend(reverse = TRUE)) +
+         linetype = guide_legend(reverse = TRUE),
+         pch = guide_legend(reverse = TRUE)) +
   theme(legend.position = c(0.3, 0.15))
 
 ggsave("palotina.png", width = 6, height = 5)
