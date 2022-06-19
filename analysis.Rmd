@@ -39,7 +39,7 @@ plot(pal_model, ylim = c(0, 3000), log = "")
 
 
 ```{r}
-summary(pal_model)
+summary(pal_model) 
 broom::tidy(pal_model)
 ```
 
