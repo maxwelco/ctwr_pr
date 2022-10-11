@@ -39,8 +39,13 @@ plot(pal_model, ylim = c(0, 3000), log = "")
 
 
 ```{r}
-summary(pal_model) 
-broom::tidy(pal_model)
+summary(pal_model)
+```
+
+
+```{r}
+broom::tidy(pal_model) %>% 
+  mutate_if(is_double, ~round(.,2))
 ```
 
 ```{r}
@@ -77,8 +82,8 @@ palotina |>
   theme_base() +
   scale_y_continuous(limits = c(0, 2500)) +
   labs(color = NULL, linetype = NULL, pch = NULL,
-       x = "Dias após o plantio",
-       y = expression(paste("Produtividade (kg ha "^"-1",")"))) +
+       x = "Days After Emergence",
+       y = expression(paste("Soybean Yield (kg ha "^"-1",")"))) +
   scale_color_brewer(palette = "Set1") +
   guides(color = guide_legend(reverse = TRUE),
          linetype = guide_legend(reverse = TRUE),
